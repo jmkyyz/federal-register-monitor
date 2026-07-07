@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Federal Register Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f4f4f6; color: #1c1c1e; }
+  header { background: #1f3a5f; color: #fff; padding: 14px 24px; }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  header span { opacity: .75; font-size: 13px; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 16px 24px 48px; }
+  form.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; background: #fff;
+    border: 1px solid #e0e0e4; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; }
+  form.filters label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+    color: #666; display: block; margin-bottom: 3px; }
+  form.filters input, form.filters select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; }
+  form.filters button { padding: 7px 16px; border: 0; border-radius: 5px; background: #1f3a5f; color: #fff; cursor: pointer; }
+  .card { background: #fff; border: 1px solid #e0e0e4; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .card.urgent { border-left: 4px solid #c62828; }
+  .card h2 { margin: 0 0 6px; font-size: 15px; line-height: 1.35; }
+  .card h2 a { color: #1f3a5f; text-decoration: none; }
+  .card h2 a:hover { text-decoration: underline; }
+  .meta { font-size: 12.5px; color: #555; margin-bottom: 6px; }
+  .abstract { font-size: 13px; color: #333; margin: 6px 0 0; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-right: 5px; }
+  .tag.type { background: #e8eef7; color: #1f3a5f; }
+  .tag.stage-pi { background: #fff3e0; color: #a05c00; }
+  .tag.stage-pub { background: #e6f4ea; color: #1e6b34; }
+  .tag.urgent { background: #fdecea; color: #c62828; font-weight: 600; }
+  .tag.term { background: #f0e9f7; color: #5b3d8a; }
+  .tag.notified { background: #ececf0; color: #666; }
+  .empty { text-align: center; color: #888; padding: 48px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Federal Register Monitor</h1>
+  <span>Canadian trade, industry &amp; policy watchlist &middot; {{ docs|length }} documents shown</span>
+</header>
+<div class="wrap">
+  <form class="filters" method="get">
+    <div><label>Status</label>
+      <select name="status">
+        <option value="watchlist" {{ 'selected' if status == 'watchlist' }}>Watchlist hits</option>
+        <option value="urgent" {{ 'selected' if status == 'urgent' }}>Urgent only</option>
+        <option value="all" {{ 'selected' if status == 'all' }}>All stored</option>
+      </select></div>
+    <div><label>Agency contains</label>
+      <input name="agency" value="{{ agency }}" placeholder="e.g. Customs"></div>
+    <div><label>From</label><input type="date" name="date_from" value="{{ date_from }}"></div>
+    <div><label>To</label><input type="date" name="date_to" value="{{ date_to }}"></div>
+    <button type="submit">Filter</button>
+  </form>
+
+  {% for d in docs %}
+  <div class="card {{ 'urgent' if d.is_urgent }}">
+    <h2><a href="{{ d.html_url }}" target="_blank" rel="noopener">{{ d.title }}</a></h2>
+    <div class="meta">
+      {{ d.agencies | join(' · ') }}
+      {% if d.publication_date %} &middot; published {{ d.publication_date }}
+      {% elif d.scheduled_pub_date %} &middot; scheduled {{ d.scheduled_pub_date }}{% endif %}
+    </div>
+    <div>
+      <span class="tag type">{{ d.document_type }}</span>
+      {% if d.source_stage == 'public_inspection' %}
+        <span class="tag stage-pi">public inspection{{ ' — special filing' if d.filing_type == 'special' }}</span>
+      {% else %}
+        <span class="tag stage-pub">published</span>
+      {% endif %}
+      {% if d.is_urgent %}<span class="tag urgent">URGENT</span>{% endif %}
+      {% if d.significant %}<span class="tag urgent" style="background:#fff3e0;color:#a05c00;">significant</span>{% endif %}
+      {% for t in d.matched_terms %}<span class="tag term">{{ t }}</span>{% endfor %}
+      {% if d.notified_at %}<span class="tag notified">notified {{ d.notified_at[:10] }}</span>{% endif %}
+    </div>
+    {% if d.abstract %}<p class="abstract">{{ d.abstract[:400] }}{{ '…' if d.abstract|length > 400 }}</p>{% endif %}
+  </div>
+  {% else %}
+  <div class="empty">No documents match the current filters.</div>
+  {% endfor %}
+</div>
+</body>
+</html>

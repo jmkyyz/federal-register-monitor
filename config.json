@@ -1,0 +1,23 @@
+{
+  "watchlist": {
+    "agencies": [
+      "Trade Representative",
+      "International Trade Administration",
+      "Import Administration",
+      "U.S. Customs and Border Protection",
+      "Industry and Security",
+      "Treasury Department",
+      "Foreign Assets Control"
+    ],
+    "terms": [
+      "Canada",
+      "Canadian",
+      "USMCA",
+      "CUSMA",
+      "softwood lumber",
+      "dairy tariff-rate quota"
+    ]
+  },
+  "document_types": ["RULE", "PRORULE", "NOTICE", "PRESDOCU"],
+  "request_timeout_seconds": 30
+}
