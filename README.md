@@ -20,11 +20,12 @@ no scraping, no API key.
   `python3 ingest.py published [--date YYYY-MM-DD]`. Add `--force` to run on
   weekends/US federal holidays (normally skipped).
 - `app.py` — Flask app on **port 5007**: dashboard + Cowork API.
-- `send_roundup.py` — 5 p.m. round-up email of unnotified watchlist hits
-  (urgent on top), then stamps `notified_at`. Shares that stamp with the
-  Cowork API so no item is ever reported twice across channels. `--dry-run`
-  prints instead of sending. **Home machine only** — a dashboard-only install
-  (e.g. work computer) should not run this or items get claimed twice.
+- `send_roundup.py` — **manual/backup** email sender: mails unnotified
+  watchlist hits (urgent on top), then stamps `notified_at`. NOT on a cron —
+  the daily 5 p.m. "Canada Watch" email comes from a Cowork scheduled task
+  that reads `/api/pending`, drops a digest JSON into
+  `../gazette-monitor/outbox/`, and must then POST `/api/mark_notified`.
+  Run this script only if that task is down (`--dry-run` to preview).
 
 ## Ingestion behaviour
 - Upserts on `document_number`. When a doc moves from Public Inspection to
@@ -51,8 +52,8 @@ no scraping, no API key.
 0  9  * * 1-5  public-inspection    # 8:45 a.m. regular filings
 30 11 * * 1-5  public-inspection    # ~11:15 a.m. updates
 30 16 * * 1-5  public-inspection    # ~4:15 p.m. updates + special filings
-0  17 * * 1-5  send_roundup.py      # 5 p.m. round-up email (home machine only)
 ```
+(The 5 p.m. Canada Watch email is a Cowork scheduled task, not a cron entry.)
 All entries `cd` into this directory and append to `ingest.log`.
 
 ## Run the dashboard

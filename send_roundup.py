@@ -3,7 +3,7 @@
 Federal Register 5 p.m. round-up email.
 
 Collects watchlist hits that haven't been notified yet (notified_at IS NULL),
-emails them as a single daily round-up (urgent items on top), then stamps
+emails them as a single round-up (urgent items on top), then stamps
 notified_at so the same items are never sent twice. This shares notified_at
 with the Cowork /api/pending endpoints, so whichever channel reports an item
 first claims it.
@@ -12,8 +12,9 @@ Credentials: read from ~/statcan-explorer/.env (SMTP_HOST, SMTP_PORT,
 SMTP_USER, SMTP_PASS, NOTIFY_TO) — same file the Gazette digest uses — with
 the Desktop RTF app-password file as a manual-run fallback.
 
-Cron (home machine only — the work-computer copy is dashboard-only):
-    0 17 * * 1-5  cd ~/statcan-explorer/federal-register-monitor && /usr/local/bin/python3 send_roundup.py >> ingest.log 2>&1
+Backup/manual use only — the daily 5 p.m. Canada Watch email is a Cowork
+scheduled task (reads /api/pending, drops JSON in ../gazette-monitor/outbox/,
+then POSTs /api/mark_notified). Do not cron this alongside it:
 
 Usage:
     python3 send_roundup.py             # send + mark notified
