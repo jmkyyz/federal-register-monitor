@@ -8,7 +8,7 @@ notified_at so the same items are never sent twice. This shares notified_at
 with the Cowork /api/pending endpoints, so whichever channel reports an item
 first claims it.
 
-Credentials: read from ~/statcan-explorer/.env (SMTP_HOST, SMTP_PORT,
+Credentials: read from ~/projects/gazette-monitor/.env (SMTP_HOST, SMTP_PORT,
 SMTP_USER, SMTP_PASS, NOTIFY_TO) — same file the Gazette digest uses — with
 the Desktop RTF app-password file as a manual-run fallback.
 
@@ -33,8 +33,8 @@ from pathlib import Path
 from models import get_db, init_db
 
 HERE = Path(__file__).resolve().parent
-ENV_FILE = HERE.parent / ".env"
-APP_PASSWORD_RTF = Path("/Users/jasonkirby/Desktop/StatCanApp/gmail_app_password.txt.rtf")
+ENV_FILE = HERE.parent / "gazette-monitor" / ".env"
+APP_PASSWORD_RTF = Path("/Users/jasonkirby/.config/gmail_app_password.txt.rtf")
 
 FROM_DEFAULT = "jmk.yyz.data@gmail.com"
 TO_DEFAULT = "jasonkirby@gmail.com"
